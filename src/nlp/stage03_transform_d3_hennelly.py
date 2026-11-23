@@ -1,4 +1,4 @@
-"""stage03_transform_d2_hennelly.py.
+"""stage03_transform_d3_hennelly.py.
 
 (EDIT YOUR VERSION OF THIS FILE)
 
@@ -110,6 +110,7 @@ Edit your Python file to:
 # ============================================================
 
 import logging
+import re
 
 from bs4 import BeautifulSoup, Tag
 import pandas as pd
@@ -142,36 +143,51 @@ def _get_text(element: Tag | None, strip_prefix: str = "", separator: str = "") 
     return text.replace(strip_prefix, "").strip() if strip_prefix else text
 
 
-def _clean_text(text: str, nlp_model: spacy.language.Language) -> str:
-    """Clean and normalize a text string for NLP analysis.
+def _clean_text(
+    text: str,
+    nlp_model: spacy.language.Language,
+    standardize_abbreviations: bool = False,
+) -> str:
+    """Clean text, optionally standardizing the paper's abbreviations.
 
     Args:
-        text (str): Raw text string to clean.
+        text: Raw text to clean.
         nlp_model: Loaded spaCy pipeline.
+        standardize_abbreviations: Whether to standardize selected terms.
 
     Returns:
-        str: Cleaned text string.
+        Cleaned text containing space separated tokens.
     """
-    # Step 1: Lowercase.
-    # WHY: "The" and "the" are the same word for analysis purposes.
-    # TRADEOFF: Proper nouns lose their case signal.
     text = text.lower()
 
-    # Step 2: Clean text by removing stopwords, punctuation, and extra whitespace using spaCy.
-    # WHY: Removing stopwords and punctuation reduces noise and focuses on meaningful content.
-    # TRADEOFF: Some stopwords matter in certain contexts (e.g., "not").
-    # TRADEOFF: Removing punctuation loses sentence boundary information.
-    # TRADEOFF: Hyphenated terms lose their compound meaning as a unit.
-    # Hyphenated terms like red-teaming are split by spaCy into red, -, teaming,
-    # and the hyphen is then dropped, so no fused tokens are produced.
+    # Standardize before removing punctuation and stopwords.
+    # Underscores keep each standardized label together.
+    if standardize_abbreviations:
+        replacements = [
+            (
+                r"\bair\s+traffic\s+controllers?\b|\batcos?\b",
+                "air_traffic_controller",
+            ),
+            (
+                r"\bdeep\s+learning\b|\bdl\b",
+                "deep_learning",
+            ),
+            (
+                r"\bconflict\s+detection\s+and\s+resolution\b|\bcd\s*&\s*r\b",
+                "conflict_detection_resolution",
+            ),
+        ]
+
+        for pattern, replacement in replacements:
+            text = re.sub(pattern, replacement, text)
+
     doc = nlp_model(text)
-    text = " ".join(
+
+    return " ".join(
         token.text
         for token in doc
         if not (token.is_stop or token.is_punct or token.is_space)
     )
-
-    return text
 
 
 # ============================================================
@@ -182,12 +198,14 @@ def _clean_text(text: str, nlp_model: spacy.language.Language) -> str:
 def run_transform(
     soup: BeautifulSoup,
     LOG: logging.Logger,
+    standardize_abbreviations: bool = False,
 ) -> pd.DataFrame:
     """Transform HTML into a clean, analysis-ready DataFrame.
 
     Args:
         soup (BeautifulSoup): Validated BeautifulSoup object.
         LOG (logging.Logger): The logger instance.
+        standardize_abbreviations (bool): Whether to standardize selected terms.
 
     Returns:
         pd.DataFrame: The transformed and analysis-ready dataset.
@@ -301,7 +319,11 @@ def run_transform(
     LOG.info("========================")
 
     abstract_clean: str = (
-        _clean_text(abstract_raw, nlp) if abstract_raw != "unknown" else "unknown"
+        _clean_text(
+            abstract_raw, nlp, standardize_abbreviations=standardize_abbreviations
+        )
+        if abstract_raw != "unknown"
+        else "unknown"
     )
 
     # Log before and after to make the cleaning effect visible

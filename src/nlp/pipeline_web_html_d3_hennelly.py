@@ -46,6 +46,7 @@ Run from root project folder with:
 import logging
 
 from datafun_toolkit.logger import get_logger, log_header, log_path
+import pandas as pd
 
 from nlp.config_d3_hennelly import (
     DATA_PATH,
@@ -103,17 +104,41 @@ def main() -> None:
     )
 
     # TRANSFORM
-    df = run_transform(
-        soup=validated_soup,
-        LOG=LOG,
-    )
+    # Process the same abstract with and without abbreviation standardization.
+    results: list[pd.DataFrame] = []
 
-    # ANALYZE
-    run_analyze(df=df, LOG=LOG, output_dir=PROCESSED_PATH / "d3_hennelly_baseline")
+    for version, standardize in (
+        ("baseline", False),
+        ("standardized", True),
+    ):
+        LOG.info("Processing version: %s", version)
 
-    # LOAD
+        df = run_transform(
+            soup=validated_soup,
+            LOG=LOG,
+            standardize_abbreviations=standardize,
+        )
+        df["preprocessing"] = version
+
+        # Save separate charts for each version.
+        run_analyze(
+            df=df,
+            LOG=LOG,
+            output_dir=PROCESSED_PATH / f"d3_hennelly_{version}",
+        )
+
+        # Save each version's measurements.
+        run_load(
+            df=df,
+            processed_csv_path=PROCESSED_PATH / f"d3_hennelly_{version}.csv",
+            LOG=LOG,
+        )
+        results.append(df)
+
+    # Save both versions together for comparison.
+    comparison_df = pd.concat(results, ignore_index=True)
     run_load(
-        df=df,
+        df=comparison_df,
         processed_csv_path=PROCESSED_CSV_PATH,
         LOG=LOG,
     )
