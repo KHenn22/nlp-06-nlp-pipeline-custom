@@ -2,6 +2,9 @@
 
 NO EDITS REQUIRED IN THIS FILE (if the paths have not changed.)
 
+Author: Kevin Hennelly
+Date: 2026-11
+
 Purpose
 
   Orchestrate a standard EVTAL pipeline for web document data.

@@ -2,6 +2,9 @@
 
 NO EDITS REQUIRED IN THIS FILE (if paths have not changed.)
 
+Author: Kevin Hennelly
+Date: 2026-11
+
 Source: DataFrame (in this case, a Pandas DataFrame, change if using polars)
 Sink: CSV file
 
