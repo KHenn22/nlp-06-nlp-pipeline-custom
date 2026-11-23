@@ -115,11 +115,11 @@ additional approaches to language understanding.
 
 ## Project Links
 
-- [GitHub Repository](https://github.com/denisecase/nlp-06-nlp-pipeline)
-- [Example Pipeline](https://github.com/denisecase/nlp-06-nlp-pipeline/blob/main/src/nlp/pipeline_web_html.py)
-- [Example Configuration](https://github.com/denisecase/nlp-06-nlp-pipeline/blob/main/src/nlp/config.py)
-- [Transform Stage](https://github.com/denisecase/nlp-06-nlp-pipeline/blob/main/src/nlp/stage03_transform.py)
-- [Analyze Stage](https://github.com/denisecase/nlp-06-nlp-pipeline/blob/main/src/nlp/stage04_analyze.py)
+- [GitHub Repository](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom)
+- [Example Pipeline](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/blob/main/src/nlp/pipeline_web_html.py)
+- [Example Configuration](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/blob/main/src/nlp/config.py)
+- [Transform Stage](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/blob/main/src/nlp/stage03_transform.py)
+- [Analyze Stage](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/blob/main/src/nlp/stage04_analyze.py)
 
 ## Project Resources
 
