@@ -46,6 +46,36 @@ Extract, Validate, Transform, Analyze, Load (EVTAL).
 The project is configured in
 [pyproject.toml](pyproject.toml).
 
+## D2: Small Technical Modification: Average Token Length
+
+**Modification:** I added an `average_token_length` feature to the
+Transform stage and included it in a separate processed CSV named d2_hennelly_processed.
+
+**Reason:** This provides another way to describe the abstract’s
+vocabulary and can also be used later with my ATC paper.
+
+**Prediction:** I predicted that the average token length would be
+relatively high because the abstract contains longer technical terms.
+I expected the existing token counts and frequency results to remain
+unchanged.
+
+**Observed result:** The pipeline ran successfully and calculated an
+average token length of 7.9769 characters. The existing results remained
+130 cleaned tokens, 118 unique tokens, and a type-token ratio of 0.9077.
+
+**What I learned:** I learned how to calculate a new feature from existing
+cleaned tokens and verify that the original measurements remained unchanged.
+
+Run the D2 version from the project root:
+
+```powershell
+uv run python -m nlp.pipeline_web_html_d2_hennelly
+```
+
+[D2 Transform code](src/nlp/stage03_transform_d2_hennelly.py)
+
+[D2 processed CSV](data/processed/d2_hennelly_processed.csv)
+
 ## Data
 
 The example retrieves an academic paper's abstract page
