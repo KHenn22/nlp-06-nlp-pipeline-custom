@@ -1,263 +1,100 @@
 # nlp-06-nlp-pipeline-custom
 
-[![Python 3.14](https://img.shields.io/badge/python-3.14%2B-blue?logo=python)](pyproject.toml)
 [![CI](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/actions/workflows/ci-python-zensical.yml/badge.svg)](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/actions/workflows/ci-python-zensical.yml)
-[![Documentation](https://img.shields.io/badge/docs-site-blue?logo=github)](https://khenn22.github.io/nlp-06-nlp-pipeline-custom/)
-
+[![Documentation](https://img.shields.io/badge/docs-site-blue)](https://khenn22.github.io/nlp-06-nlp-pipeline-custom/)
 [![uv managed](https://img.shields.io/badge/uv-managed-DE5FE9)](https://docs.astral.sh/uv/)
-[![ty type checked](https://img.shields.io/badge/ty-type_checked-2F80ED)](https://docs.astral.sh/ty/)
-[![Zensical docs](https://img.shields.io/badge/Zensical-docs-purple)](https://zensical.org/)
-[![MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
-> Build a reproducible NLP pipeline for acquiring, processing, and analyzing web text.
+**Author:** Kevin Hennelly
+
+**Date:** November 2026
+
+**Course:** Web Mining and Applied NLP, Project 06
 
 ## Project Overview
 
-Author: Kevin Hennelly
+This project examines how standardizing abbreviations changes the vocabulary
+measurements of an air traffic control research abstract. It adapts Denise Case's
+Extract, Validate, Transform, Analyze, Load (EVTAL) pipeline to the same ATC paper
+used in my Module 05 project.
 
-Date: 2026 November
+The custom pipeline processes the abstract twice: once with the existing cleaning
+steps and once with three additional rules that combine full terms and their
+abbreviations into shared labels. It compares token frequencies, total and unique
+token counts, type-token ratio, and average token length. Separate CSVs and charts
+are saved for each version, along with a combined comparison CSV.
 
-Sixth project in the Web Mining and Applied NLP course.
+The [full project report](https://khenn22.github.io/nlp-06-nlp-pipeline-custom/)
+explains the data, methods, findings, limitations, and next steps.
 
-This project introduces a complete natural language
-processing pipeline for working with web documents.
+## Data and Approach
 
-The goal is to retrieve HTML,
-validate document structure,
-extract and clean text,
-engineer NLP features,
-visualize patterns,
-and persist the results.
+The source is the HTML abstract page for
+[Data-driven prediction of Air Traffic Controllers reactions to resolving conflicts](https://arxiv.org/abs/2205.09539)
+by Alevizos Bastas and George A. Vouros. The analysis uses the abstract and
+bibliographic metadata, rather than the full paper or operational ATC records.
 
-The project extends the EVTL approach
-from earlier modules by adding an explicit
-Analyze stage.
+Requests retrieves the page, BeautifulSoup extracts and validates its structure,
+spaCy cleans and tokenizes the abstract, Pandas organizes the measurements, and
+Matplotlib and WordCloud create the visualizations. Python regular expressions
+apply the custom standardization rules before tokenization.
 
-Specifically, it reuses frequency and charts from 01,
-cleaning from 02,
-the stage pattern from 04, and
-extraction from 05.
-Co-occurrence and bigrams were covered in 03,
-but are not required for this project.
+| Full term and abbreviation | Shared label |
+| --- | --- |
+| Air Traffic Controller(s); ATCO(s) | `air_traffic_controller` |
+| Deep learning; DL | `deep_learning` |
+| Conflict detection and resolution; CD&R | `conflict_detection_resolution` |
 
-The resulting architecture is
-Extract, Validate, Transform, Analyze, Load (EVTAL).
-
-The project is configured in
-[pyproject.toml](pyproject.toml).
-
-## D2: Small Technical Modification: Average Token Length
-
-**Modification:** I added an `average_token_length` feature to the
-Transform stage and included it in a separate processed CSV named d2_hennelly_processed.
-
-**Reason:** This provides another way to describe the abstract’s
-vocabulary and can also be used later with my ATC paper.
-
-**Prediction:** I predicted that the average token length would be
-relatively high because the abstract contains longer technical terms.
-I expected the existing token counts and frequency results to remain
-unchanged.
-
-**Observed result:** The pipeline ran successfully and calculated an
-average token length of 7.9769 characters. The existing results remained
-130 cleaned tokens, 118 unique tokens, and a type-token ratio of 0.9077.
-
-**What I learned:** I learned how to calculate a new feature from existing
-cleaned tokens and verify that the original measurements remained unchanged.
-
-Run the D2 version from the project root:
-
-```powershell
-uv run python -m nlp.pipeline_web_html_d2_hennelly
-```
-
-[D2 Transform code](src/nlp/stage03_transform_d2_hennelly.py)
-
-[D2 processed CSV](data/processed/d2_hennelly_processed.csv)
-
-## Data
-
-The example retrieves an academic paper's abstract page
-from [arXiv](https://arxiv.org/abs/2602.20021).
-
-The source document contains:
-
-- Paper title.
-- Authors.
-- Abstract text.
-- Subject categories.
-- Submission information.
-- arXiv identifier.
-
-The pipeline preserves the original HTML,
-extracts document metadata,
-and produces a structured dataset
-with derived NLP features.
-
-## Approach
-
-The project uses a modular Python pipeline
-to acquire, validate, transform, analyze,
-and save web document data.
-
-The pipeline has five stages:
-
-- **Extract** - retrieve HTML from a web page.
-- **Validate** - verify required HTML elements.
-- **Transform** - extract metadata, clean text, and calculate NLP features.
-- **Analyze** - examine token frequencies and create visualizations.
-- **Load** - save the processed dataset to a CSV file.
-
-The example uses Requests for HTTP acquisition,
-BeautifulSoup for HTML parsing,
-spaCy for linguistic text processing,
-Pandas for tabular data,
-and Matplotlib and WordCloud for visualization.
-
-The Transform stage demonstrates:
-
-- Tokenization and text normalization.
-- Punctuation and stopword removal.
-- Abstract word counts.
-- Cleaned token counts.
-- Unique token counts.
-- Type-token ratios.
-- Author counts.
-
-Explore these important project components:
-
-- [pyproject.toml](pyproject.toml) - project identity, dependencies, and tool configuration.
-- [src/nlp/pipeline_web_html.py](src/nlp/pipeline_web_html.py) - main EVTAL pipeline orchestrator.
-- [src/nlp/config.py](src/nlp/config.py) - example web page and path configuration.
-- [src/nlp/stage01_extract.py](src/nlp/stage01_extract.py) - retrieve HTML.
-- [src/nlp/stage02_validate.py](src/nlp/stage02_validate.py) - validate HTML structure.
-- [src/nlp/stage03_transform.py](src/nlp/stage03_transform.py) - clean text and engineer NLP features.
-- [src/nlp/stage04_analyze.py](src/nlp/stage04_analyze.py) - analyze token frequencies and generate visualizations.
-- [src/nlp/stage05_load.py](src/nlp/stage05_load.py) - save processed results.
-- [tests/](tests/) - automated tests.
-- [.github/workflows/](.github/workflows/) - automated testing and documentation deployment.
-- [docs/](docs/) - project documentation.
-- [zensical.toml](zensical.toml) - documentation configuration.
-
-The goal is to understand how an NLP pipeline
-transforms raw web content into structured,
-analysis-ready data with interpretable features.
-
-## spaCy Pipeline
-
-The project uses [spaCy](https://spacy.io/)
-for tokenization and for flagging
-stopwords and punctuation.
-
-The example uses the `en_core_web_sm`
-small English trained pipeline.
-
-The package is declared in
-[pyproject.toml](pyproject.toml)
-and installs with the project dependencies.
-
-The example uses spaCy to split text into tokens
-and remove stopwords and punctuation.
-The same pipeline also provides part-of-speech tagging,
-dependency parsing, and named entity recognition.
-This example does not use those components.
-
-Text preprocessing remains useful in modern NLP,
-particularly when creating inspectable,
-repeatable analysis pipelines.
-
-## Run the Project
-
-Follow the [Professional Python Workflow Guide](https://denisecase.github.io/pro-analytics-02/)
-to set up your machine and project environment.
-
-From a VS Code terminal in the project root:
-
-```shell
-uv run python -m nlp.pipeline_web_html
-```
+Both versions lowercase the text and remove spaCy stopwords, punctuation tokens,
+and whitespace tokens. Neither version applies stemming or lemmatization.
+Only the standardization setting changes between the two versions.
 
 ## Results
 
-The pipeline retrieves an HTML document,
-validates its structure,
-extracts bibliographic information,
-and cleans the abstract text.
+| Measurement | Baseline | Standardized |
+| --- | ---: | ---: |
+| Cleaned token count | 88 | 83 |
+| Unique token count | 62 | 59 |
+| Type-token ratio | 0.7045 | 0.7108 |
+| Average token length, characters | 6.8182 | 9.2289 |
 
-It calculates NLP features,
-produces frequency visualizations,
-and writes the results to a CSV file.
+### Standardized Token Frequencies
 
-Successful execution produces:
+![Top 20 tokens in the standardized ATC abstract, led by air_traffic_controller with six occurrences.](docs/images/d3_standardized_top_tokens.png)
 
-```shell
-========================
-Pipeline executed successfully!
-========================
+Standardization grouped the full and abbreviated forms of selected concepts.
+Token count and unique token count decreased, while type-token ratio increased
+slightly. Average token length increased because several words or a short acronym
+were replaced with one longer label; underscores also count as characters.
+These changes demonstrate the effect of preprocessing on text statistics.
+They do not establish improved predictive accuracy or greater writing complexity.
+
+## Project Commands
+
+Install Git, VS Code, and uv using the
+[Professional Python Workflow Guide](https://denisecase.github.io/pro-analytics-02/).
+Run the commands below in PowerShell. After cloning, run all remaining commands
+from the repository root, where `pyproject.toml` is located.
+
+### Get the Project
+
+```powershell
+git clone https://github.com/KHenn22/nlp-06-nlp-pipeline-custom.git
+cd nlp-06-nlp-pipeline-custom
 ```
 
-The following files are created:
+### Set Up the Environment
 
-- `project.log` - pipeline execution log.
-- `data/raw/case_raw.html` - original HTML document.
-- `data/processed/case_processed.csv` - processed NLP dataset.
-- `data/processed/case_top_tokens.png` - token frequency bar chart.
-- `data/processed/case_wordcloud.png` - word cloud visualization.
+The project uses Python 3.14. The spaCy `en_core_web_sm` model and the development
+and documentation dependencies are declared in `pyproject.toml`.
 
-These artifacts provide evidence of successful
-data acquisition, validation, transformation,
-analysis, and persistence.
-
-### Example Visualizations
-
-![Top Tokens](docs/images/case_top_tokens.png)
-
-![Word Cloud](docs/images/case_wordcloud.png)
-
-## Verification
-
-Run the automated tests:
-
-```shell
-uv run python -m pytest
+```powershell
+uv python install
+uv sync --frozen
 ```
 
-## Project Documentation
+For the instructor's environment maintenance workflow:
 
-The [hosted documentation site](https://khenn22.github.io/nlp-06-nlp-pipeline-custom/)
-is published using Zensical and GitHub Pages.
-
-The documentation site is used to present the project report,
-covering such sections as data, methods, results, visualizations,
-interpretation, and conclusions.
-
-For additional context about traditional NLP
-and modern language-model approaches,
-see [NLP Evolution](docs/nlp-evolution.md).
-
-## CI/CD and GitHub Actions
-
-This project includes continuous integration and continuous deployment (CI/CD)
-to check project files and publish the docs.
-
-GitHub Actions include:
-
-- [CI: Python and Documentation Checks](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/actions/workflows/ci-python-zensical.yml)
-- [CD: Documentation Deployment](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/actions/workflows/deploy-zensical.yml)
-
-## Developer Reference
-
-Follow the
-[Professional Python Workflow Guide](https://denisecase.github.io/pro-analytics-02/)
-for **detailed instructions and troubleshooting**.
-
-### Initialize and Update the Python Environment
-
-With the project open in VS Code, open a VS Code terminal.
-Paste each command and hit Enter or Return after to run it.
-
-```shell
+```powershell
 uvx pup-clean --delete
 uv self update
 uv python pin 3.14
@@ -269,67 +106,132 @@ uv audit
 
 ### Set Up and Run Git Hooks
 
-Set up and run the git hooks to perform
-basic checks automatically before
-any changes get pushed to GitHub.
-
-In the VS Code terminal,
-paste each command and hit Enter or Return after to run it.
-
-```shell
+```powershell
 uvx prek install --force
 uvx prek update --freeze --cooldown-days 7
-
 git add -A
-uvx prek run --all-files
-# repeat if changes were made
 uvx prek run --all-files
 ```
 
-### Run Common Chores
+If a hook modifies files, stage the changes and run the hooks again:
 
-Run linters, formatters, type checks, tests, and
-build the documentation.
+```powershell
+git add -A
+uvx prek run --all-files
+```
 
-```shell
+### Run the Custom ATC Comparison
+
+```powershell
+uv run python -m nlp.pipeline_web_html_d3_hennelly
+```
+
+Successful execution ends with `Pipeline executed successfully!`.
+Inspect the combined CSV in PowerShell:
+
+```powershell
+Import-Csv .\data\processed\d3_hennelly_processed.csv |
+    Format-Table preprocessing, token_count, unique_token_count, type_token_ratio, average_token_length -AutoSize
+```
+
+The combined file should contain two rows: `baseline` and `standardized`.
+
+### Run the Original Example or D2 Experiment
+
+```powershell
+uv run python -m nlp.pipeline_web_html
+uv run python -m nlp.pipeline_web_html_d2_hennelly
+```
+
+### Run Common Chores and Preview the Documentation
+
+```powershell
 uv run ruff check . --fix
 uv run ruff format .
-
 uv run ty check
 uv run python -m pytest
 uv run python -m zensical build
 ```
 
-### Git add-commit-push to GitHub
+To preview the website locally:
 
-After making useful changes, save your work to GitHub.
+```powershell
+uv run python -m zensical serve --open
+```
 
-```shell
+Press `Ctrl+C` to stop the preview. In VS Code, use `Ctrl+Shift+V` to preview
+`README.md` or `docs/index.md`.
+
+### Save Changes to GitHub
+
+```powershell
 git add -A
-git commit -m "describe your changes in quotes"
+git commit -m "Finalize ATC analysis documentation and results"
 git push -u origin main
 ```
 
-## Developer Notes
+Check the [Actions tab](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/actions)
+after pushing. CI checks the repository, and the documentation workflow publishes
+the website to GitHub Pages.
 
-- Use the **UP ARROW** and **DOWN ARROW** in the terminal to scroll through past commands.
-- Use `CTRL+f` to find (and replace) text within a file.
+## Custom Output Files
 
-## Developer Tools
+| Path | Contents |
+| --- | --- |
+| `data/raw/d3_hennelly_raw.html` | Retrieved HTML source |
+| `data/processed/d3_hennelly_baseline.csv` | One baseline result row |
+| `data/processed/d3_hennelly_standardized.csv` | One standardized result row |
+| `data/processed/d3_hennelly_processed.csv` | Both result rows for comparison |
+| `data/processed/d3_hennelly_baseline/` | Baseline frequency chart and word cloud |
+| `data/processed/d3_hennelly_standardized/` | Standardized frequency chart and word cloud |
+| `docs/images/d3_*.png` | Copies of custom visuals used in the published report |
 
-This project uses professional Python tools to support development,
-testing, documentation, and code quality.
+When rerunning the analysis changes the charts, refresh the documentation copies:
 
-- [uv](https://docs.astral.sh/uv/) - Python environments and dependencies.
-- [Ruff](https://docs.astral.sh/ruff/) - Python linting and formatting, configured in [.ruff.toml](.ruff.toml).
-- [ty](https://docs.astral.sh/ty/) - Python type checking.
-- [pytest](https://docs.pytest.org/) - automated Python testing, configured in [.pytest.toml](.pytest.toml).
-- [prek](https://prek.j178.dev/) - Git hooks and automated checks, configured in [prek.toml](prek.toml).
-- [Zensical](https://zensical.org/) - project documentation, configured in [zensical.toml](zensical.toml).
+```powershell
+Copy-Item .\data\processed\d3_hennelly_baseline\d3_hennelly_top_tokens.png .\docs\images\d3_baseline_top_tokens.png
+Copy-Item .\data\processed\d3_hennelly_baseline\d3_hennelly_wordcloud.png .\docs\images\d3_baseline_wordcloud.png
+Copy-Item .\data\processed\d3_hennelly_standardized\d3_hennelly_top_tokens.png .\docs\images\d3_standardized_top_tokens.png
+Copy-Item .\data\processed\d3_hennelly_standardized\d3_hennelly_wordcloud.png .\docs\images\d3_standardized_wordcloud.png
+```
+
+## D2: Average Token Length Experiment
+
+**Modification:** I added `average_token_length` to the Transform stage and
+saved it in a separate [D2 CSV](data/processed/d2_hennelly_processed.csv).
+
+**Reason and prediction:** This feature provides another description of the
+abstract's vocabulary and can be reused for the ATC paper. Before running it,
+I predicted a relatively high average because the example abstract contains
+technical terms. I expected the existing counts and frequencies to stay unchanged.
+
+**Observed result:** The D2 example produced an average token length of
+7.9769 characters, with 130 cleaned tokens, 118 unique tokens, and a type-token
+ratio of 0.9077. The added calculation left the existing measurements unchanged.
+
+**What I learned:** A feature can be calculated from existing cleaned tokens
+without changing the underlying text. Its interpretation depends on how tokens
+are represented, as the D3 comparison demonstrates.
+
+[D2 Transform code](src/nlp/stage03_transform_d2_hennelly.py)
+
+## Project Files
+
+- [D3 pipeline](src/nlp/pipeline_web_html_d3_hennelly.py): runs both versions and combines their results.
+- [D3 configuration](src/nlp/config_d3_hennelly.py): source URL and output paths.
+- [D3 Transform stage](src/nlp/stage03_transform_d3_hennelly.py): cleaning, standardization, and metrics.
+- [D3 Analyze stage](src/nlp/stage04_analyze_d3_hennelly.py): top-token charts and word clouds.
+- [Project report](docs/index.md): observations, interpretation, limitations, and next steps.
 
 ## Links
 
-- [Hosted Documentation](https://khenn22.github.io/nlp-06-nlp-pipeline-custom/)
+- [Hosted project documentation](https://khenn22.github.io/nlp-06-nlp-pipeline-custom/)
+- [Original example adapted: Denise Case's NLP pipeline](https://github.com/denisecase/nlp-06-nlp-pipeline)
+- [ATC data source](https://arxiv.org/abs/2205.09539)
+- [D2 example data source](https://arxiv.org/abs/2602.20021)
+- [Combined comparison CSV](data/processed/d3_hennelly_processed.csv)
+- [Commit history](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/commits/main/)
+- [GitHub Actions](https://github.com/KHenn22/nlp-06-nlp-pipeline-custom/actions)
 - [Professional Python Workflow Guide](https://denisecase.github.io/pro-analytics-02/)
 - [Citation](CITATION.cff)
 - [License](LICENSE)
